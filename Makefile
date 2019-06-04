@@ -2,7 +2,8 @@
 # You need emsdk environment installed and activated, see:
 # <https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html>.
 
-PRE_JS = build/pre.POST_JS_SYNC
+PRE_JS = build/pre.js
+POST_JS_SYNC = build/post-sync.js
 
 COMMON_FILTERS = aresample scale crop overlay
 COMMON_DEMUXERS = matroska ogg avi mov flv mpegps image2 mp3 concat
