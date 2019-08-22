@@ -1,32 +1,76 @@
-<script src='./ffmpeg-webm.js'></script>
-<input type=file accept="video/*" id=input>
-<video id=output autoplay style="width:100%;" controls></video>
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>合宿成果発表</title>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
+<body style="background-color: lightgray;">
+<h2>編集前<h2>
+<div style="width:560px;">
+<video id="input" preload="none" width="560" height="320" controls>
+  <source src="input.webm" type="video/webm">
+</video>
+
+<h4>トリミング<h4>
+<div style="margin:3em 0;" style="width:560;">
+  <div id="slider-range"></div>
+  <span>
+    <label for="ss">Start: </label><input type="text" id="ss" value="0:00" />
+  </span>
+  <span>
+    <label for="to">End: </label><input type="text" id="to" value="0:32" />
+  </span>
+  <button id="button">trim</button>
+</div>
+<!--
+<h4>字幕<h4>
+<div style="margin:3em 0;" style="width:560;">
+  <div id="slider-range2"></div>
+  <span>
+    <label for="start">Start: </label><input type="text" id="start" value="0" />
+  </span>
+  <span>
+    <label for="end">End: </label><input type="text" id="end" value="32" />
+  </span>
+  <br>
+  <span>
+    <label for="text">字幕: </label><input type="text" id="text" placeholder="ここにテキストを入力" />
+  </span>
+  <button id="button2">追加</button>
+</div>
+-->
+</div>
+
+<hr>
+
+<h2>編集後<h2>
+<div style="width:560px;">
+<video id=output autoplay width="560" height="320" controls>
+  <track id="subtitle" label="Japanese captions" kind="captions" srclang="ja" default>
+</video>
+</div>
+
+
+<script src='../ffmpeg-webm.js'></script>
 <script>
-input.onchange = async (e) => {
-  let file = e.target.files[0];
-  let data = await new Response(file).arrayBuffer();
-  let stderr="";
-  let stdout="";
+button.onclick = async () => {
+  let response = await fetch('input.webm');
+  let data = await response.arrayBuffer();
 
   let result = ffmpegjs({
-      arguments: ['-y','-i', file.name, 'output.webm'],
-      MEMFS: [{name: file.name, data: data}],
-      stdin: () => {},
+      arguments: ['-y',
+        '-i', 'input.webm',
+        '-ss', ss.value,  // 開始時刻
+        '-to', to.value,  // 終了時刻
+        '-c', 'copy',    // コーデック（入力ファイルと同じ）
+        'output.webm'
+      ],
+      MEMFS: [{name: 'input.webm', data: data}],
       onfilesready: (e) => {
         let data = e.MEMFS[0].data;
         output.src = URL.createObjectURL(new Blob([data]))
         console.log('ready', e)
       },
-      print: function(data) { console.log(data); stdout += data + "\n"; },
-      printErr: function(data) { console.log('error', data); stderr += data + "\n"; },
-      postRun: function(result) { console.log('DONE', result); },
-      onExit: function(code) {
-        console.log("Process exited with code " + code);
-        console.log(stdout);
-      },
     });
-
-  console.log(result);
 };
 </script>
+</body>

@@ -304,7 +304,6 @@ build/ffmpeg-mp4/ffmpeg.bc: $(MP4_SHARED_DEPS)
 # NOTE(Kagami): Bump heap size to 64M, default 16M is not enough even
 # for simple tests and 32M tends to run slower than 64M.
 EMCC_COMMON_ARGS = \
-	--closure 1 \
 	--pre-js $(PRE_JS) \
 	-s EXPORT_NAME=ffmpegjs \
 	-s AGGRESSIVE_VARIABLE_ELIMINATION=1 \
@@ -313,14 +312,14 @@ EMCC_COMMON_ARGS = \
 	-s WASM=1 \
 	-O3 --memory-init-file 0 \
 	-o $@
-  
+
 #	-s TOTAL_MEMORY=67108864 \
 #       -s OUTLINING_LIMIT=20000 \
 
 ffmpeg-webm.js: $(FFMPEG_WEBM_BC) $(PRE_JS) $(POST_JS_SYNC)
 	emcc $(FFMPEG_WEBM_BC) $(WEBM_SHARED_DEPS) \
 		--post-js $(POST_JS_SYNC) \
-		$(EMCC_COMMON_ARGS)		
+		$(EMCC_COMMON_ARGS)
 
 ffmpeg-mp4.js: $(FFMPEG_MP4_BC) $(PRE_JS) $(POST_JS_SYNC)
 	emcc $(FFMPEG_MP4_BC) $(MP4_SHARED_DEPS) \
